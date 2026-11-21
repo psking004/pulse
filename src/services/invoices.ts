@@ -116,3 +116,10 @@ export async function deleteInvoice(id: string): Promise<void> {
   const { error } = await requireClient().from('invoices').delete().eq('id', id);
   if (error) throw toServiceError(error);
 }
+
+/** Set an invoice's stored status (draft, sent or void). */
+export async function setInvoiceStatus(id: string, status: InvoiceStatus): Promise<void> {
+  const { error } = await requireClient().from('invoices').update({ status }).eq('id', id);
+  if (error) throw toServiceError(error);
+}
+
