@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageHeader } from '@/components/shared/PageHeader';
+import { PaymentForm, paymentMethodLabel } from '@/features/payments/PaymentForm';
 import { formatDate, todayISO } from '@/lib/dates';
 import { daysOverdue, PAYMENT_STATE_LABEL, paymentStateBadgeVariant, paymentStateFor } from '@/lib/invoiceStatus';
 import { formatMoney } from '@/lib/money';
@@ -321,6 +322,11 @@ export function InvoiceDetailPage() {
           </Panel>
 
           <Panel title="Payments">
+            {invoice.amount_paid > 0 && invoice.balance_due > 0 ? (
+              <p className="mb-3 text-sm text-muted-foreground">
+                {`Partially paid: ${formatMoney(invoice.amount_paid, currency)} of ${formatMoney(invoice.total_amount, currency)} received.`}
+              </p>
+            ) : null}
             {invoice.payments.length === 0 ? (
               <p className="text-sm text-muted-foreground">No payments recorded for this invoice.</p>
             ) : (
@@ -332,7 +338,7 @@ export function InvoiceDetailPage() {
                       <span className="tabular-nums">{formatMoney(payment.amount, currency)}</span>
                     </div>
                     <div className="text-muted-foreground">
-                      Method: {payment.method ? payment.method.replace(/_/g, ' ') : '—'}
+                      Method: {paymentMethodLabel(payment.method)}
                     </div>
                     <div className="text-muted-foreground">Reference: {payment.reference ?? '—'}</div>
                   </li>
@@ -340,6 +346,17 @@ export function InvoiceDetailPage() {
               </ul>
             )}
           </Panel>
+
+          {invoice.status === 'sent' && invoice.balance_due > 0 ? (
+            <Panel title="Record payment">
+              <PaymentForm
+                invoiceId={invoice.id}
+                balanceDue={invoice.balance_due}
+                currency={currency}
+                onSaved={reload}
+              />
+            </Panel>
+          ) : null}
         </div>
       </div>
 
