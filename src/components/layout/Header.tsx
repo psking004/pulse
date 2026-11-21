@@ -1,5 +1,6 @@
-import { Bell, CircleUser, Menu } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AccountMenu } from '@/features/auth/AccountMenu';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -18,9 +19,7 @@ export function Header({ onMenuClick }: HeaderProps) {
       <Button variant="ghost" size="icon" aria-label="Notifications" title="Coming soon">
         <Bell className="h-5 w-5" aria-hidden="true" />
       </Button>
-      <Button variant="ghost" size="icon" aria-label="Account menu" title="Coming soon">
-        <CircleUser className="h-5 w-5" aria-hidden="true" />
-      </Button>
+      <AccountMenu />
     </header>
   );
 }
