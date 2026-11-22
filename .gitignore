@@ -34,3 +34,4 @@ Thumbs.db
 # Local tooling and scratch
 .codebenders/
 _remote_check/
+artifacts/demo/raw/
