@@ -167,20 +167,22 @@ export function ForecastPage() {
         {
           label: 'Projected in 30 days',
           base: base.horizon30.end_balance,
-          delayed: sim.horizon30.end_balance,
+          delayed: sim.simulated_horizon30?.end_balance ?? base.horizon30.end_balance,
           change: impact30,
         },
         {
           label: 'Projected in 90 days',
           base: base.horizon90.end_balance,
-          delayed: sim.horizon90.end_balance,
+          delayed: sim.simulated_horizon90?.end_balance ?? base.horizon90.end_balance,
           change: impact90,
         },
         {
           label: 'Lowest balance (90 days)',
           base: base.horizon90.min_balance,
-          delayed: sim.horizon90.min_balance,
-          change: round2(sim.horizon90.min_balance - base.horizon90.min_balance),
+          delayed: sim.simulated_horizon90?.min_balance ?? base.horizon90.min_balance,
+          change: round2(
+            (sim.simulated_horizon90?.min_balance ?? base.horizon90.min_balance) - base.horizon90.min_balance,
+          ),
         },
       ]
     : [];

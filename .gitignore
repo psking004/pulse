@@ -35,3 +35,5 @@ Thumbs.db
 .codebenders/
 _remote_check/
 artifacts/demo/raw/
+artifacts/demo/*.mp4
+artifacts/demo/*.webm

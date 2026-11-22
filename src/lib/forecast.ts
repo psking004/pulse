@@ -69,6 +69,8 @@ export interface ForecastResult {
   simulated_series: CashPoint[] | null;
   horizon30: HorizonSummary;
   horizon90: HorizonSummary;
+  simulated_horizon30: HorizonSummary | null;
+  simulated_horizon90: HorizonSummary | null;
   simulation_impact_30: number | null;
   simulation_impact_90: number | null;
 }
@@ -193,12 +195,16 @@ export function buildForecast(input: ForecastInput): ForecastResult {
   const horizon90 = summarise(base_series, events, cashPaise, today, 90);
 
   let simulated_series: CashPoint[] | null = null;
+  let simulated_horizon30: HorizonSummary | null = null;
+  let simulated_horizon90: HorizonSummary | null = null;
   let simulation_impact_30: number | null = null;
   let simulation_impact_90: number | null = null;
   if (simulatedEvents) {
     simulated_series = buildSeries(cashPaise, simulatedEvents, today);
     const sim30 = summarise(simulated_series, simulatedEvents, cashPaise, today, 30);
     const sim90 = summarise(simulated_series, simulatedEvents, cashPaise, today, 90);
+    simulated_horizon30 = sim30;
+    simulated_horizon90 = sim90;
     simulation_impact_30 = round2(fromPaise(toPaise(sim30.end_balance) - toPaise(horizon30.end_balance)));
     simulation_impact_90 = round2(fromPaise(toPaise(sim90.end_balance) - toPaise(horizon90.end_balance)));
   }
@@ -210,6 +216,8 @@ export function buildForecast(input: ForecastInput): ForecastResult {
     simulated_series,
     horizon30,
     horizon90,
+    simulated_horizon30,
+    simulated_horizon90,
     simulation_impact_30,
     simulation_impact_90,
   };
