@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { TrendingUp } from 'lucide-react';
 import {
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
   ReferenceLine,
@@ -21,6 +20,7 @@ import { buildForecastInput } from '@/features/forecast/forecastInput';
 import { buildForecast } from '@/lib/forecast';
 import { addDays, formatDate, parseISODate, todayISO } from '@/lib/dates';
 import { formatMoney, round2 } from '@/lib/money';
+import { cn } from '@/lib/utils';
 import { getProfile } from '@/services/profile';
 import { listInvoices } from '@/services/invoices';
 import { listPayments, type PaymentWithInvoice } from '@/services/payments';
@@ -29,6 +29,7 @@ import type { Expense, InvoiceWithCustomer, Profile } from '@/types/domain';
 
 const DELAY_DAYS = 15;
 const AXIS_DATE = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' });
+const AXIS_TICK = { fontSize: 12, className: 'fill-muted-foreground' };
 
 interface ForecastData {
   profile: Profile;
@@ -49,13 +50,17 @@ interface SummaryCardProps {
   title: string;
   value: string;
   note?: string;
+  badge: 'ACTUAL' | 'ESTIMATE';
 }
 
-function SummaryCard({ title, value, note }: SummaryCardProps) {
+function SummaryCard({ title, value, note, badge }: SummaryCardProps) {
   return (
-    <Card className="p-6">
-      <p className="text-sm text-muted-foreground">{title}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-tight">{value}</p>
+    <Card className="p-4">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
+        <Badge variant="outline">{badge}</Badge>
+      </div>
+      <p className="mt-2 text-xl font-semibold tabular-nums tracking-tight">{value}</p>
       {note ? <p className="mt-1 text-xs text-muted-foreground">{note}</p> : null}
     </Card>
   );
@@ -195,23 +200,41 @@ export function ForecastPage() {
           <CardTitle>How this forecast works</CardTitle>
         </CardHeader>
         <CardContent>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-            <li>
-              Your starting balance on the starting date, plus payments received since then, minus paid expenses,
-              gives current cash.
-            </li>
-            <li>
-              Each unpaid invoice (status sent) is expected on its due date, or today if it is already overdue
-              (assumed collected today).
-            </li>
-            <li>Unpaid bills are paid on their due date, or today if they are overdue.</li>
-            <li>Unpaid non-bill expenses are not forecast.</li>
-            <li>
-              The 15-day simulation moves one selected invoice&apos;s expected date later by 15 days without changing
-              any record.
-            </li>
-            <li>No GST timing or bank fees are modelled.</li>
-          </ul>
+          <dl className="grid gap-4 text-sm sm:grid-cols-2">
+            <div className="space-y-1">
+              <dt className="font-medium">Current cash</dt>
+              <dd className="text-muted-foreground">
+                Your starting balance on the starting date, plus payments received since then, minus paid expenses,
+                gives current cash.
+              </dd>
+            </div>
+            <div className="space-y-1">
+              <dt className="font-medium">Expected collections</dt>
+              <dd className="text-muted-foreground">
+                Each unpaid invoice (status sent) is expected on its due date, or today if it is already overdue
+                (assumed collected today).
+              </dd>
+            </div>
+            <div className="space-y-1">
+              <dt className="font-medium">Unpaid bills</dt>
+              <dd className="text-muted-foreground">Unpaid bills are paid on their due date, or today if they are overdue.</dd>
+            </div>
+            <div className="space-y-1">
+              <dt className="font-medium">Unpaid expenses</dt>
+              <dd className="text-muted-foreground">Unpaid non-bill expenses are not forecast.</dd>
+            </div>
+            <div className="space-y-1">
+              <dt className="font-medium">Delay simulation</dt>
+              <dd className="text-muted-foreground">
+                The 15-day simulation moves one selected invoice&apos;s expected date later by 15 days without changing
+                any record.
+              </dd>
+            </div>
+            <div className="space-y-1">
+              <dt className="font-medium">Not modelled</dt>
+              <dd className="text-muted-foreground">No GST timing or bank fees are modelled.</dd>
+            </div>
+          </dl>
         </CardContent>
       </Card>
 
@@ -232,43 +255,47 @@ export function ForecastPage() {
         </EmptyState>
       ) : (
         <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <SummaryCard
-              title="Current cash (actual)"
+              title="Current cash"
+              badge="ACTUAL"
               value={formatMoney(base.current_cash, currency)}
               note="from recorded payments and paid expenses"
             />
             <SummaryCard
               title="Projected in 30 days"
+              badge="ESTIMATE"
               value={formatMoney(base.horizon30.end_balance, currency)}
             />
             <SummaryCard
               title="Projected in 90 days"
+              badge="ESTIMATE"
               value={formatMoney(base.horizon90.end_balance, currency)}
             />
             <SummaryCard
               title="Lowest projected balance (90 days)"
+              badge="ESTIMATE"
               value={formatMoney(base.horizon90.min_balance, currency)}
             />
           </div>
 
           <Card className="p-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex gap-2">
-                <Button
-                  variant={horizon === 30 ? 'default' : 'outline'}
-                  aria-pressed={horizon === 30}
-                  onClick={() => setHorizon(30)}
-                >
-                  30 days
-                </Button>
-                <Button
-                  variant={horizon === 90 ? 'default' : 'outline'}
-                  aria-pressed={horizon === 90}
-                  onClick={() => setHorizon(90)}
-                >
-                  90 days
-                </Button>
+              <div role="group" aria-label="Forecast horizon" className="inline-flex gap-1 rounded-lg border bg-muted/40 p-1">
+                {([30, 90] as const).map((days) => (
+                  <button
+                    key={days}
+                    type="button"
+                    aria-pressed={horizon === days}
+                    onClick={() => setHorizon(days)}
+                    className={cn(
+                      'rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      horizon === days ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    {`${days} days`}
+                  </button>
+                ))}
               </div>
               <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-4">
                 <div>
@@ -296,20 +323,31 @@ export function ForecastPage() {
               <CardTitle>Projected daily balance</CardTitle>
             </CardHeader>
             <CardContent>
+              <div className="mb-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-2">
+                  <span aria-hidden="true" className="inline-block h-0.5 w-6 bg-[#0f766e]" />
+                  Base projection
+                </span>
+                {sim ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span aria-hidden="true" className="inline-block w-6 border-t-2 border-dashed border-slate-500" />
+                    With 15-day delay
+                  </span>
+                ) : null}
+              </div>
               {chartData.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No series to show.</p>
               ) : (
                 <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="label" minTickGap={24} tick={{ fontSize: 12 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e3e8ef" />
+                    <XAxis dataKey="label" minTickGap={24} tick={AXIS_TICK} />
                     <YAxis
-                      tick={{ fontSize: 12 }}
+                      tick={AXIS_TICK}
                       width={90}
                       tickFormatter={(v: number) => v.toLocaleString('en-IN')}
                     />
                     <Tooltip formatter={(value) => formatMoney(Number(value), currency)} />
-                    {sim ? <Legend /> : null}
                     {chartHasNegative ? <ReferenceLine y={0} stroke="#94a3b8" /> : null}
                     <Line
                       type="monotone"
@@ -406,6 +444,11 @@ export function ForecastPage() {
 
               {sim && delayed && newExpected !== null ? (
                 <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Selected: {delayed.invoice_number} · {delayed.customer?.name ?? 'Customer'} · balance{' '}
+                    {formatMoney(delayed.balance_due, currency)} · due {formatDate(delayed.due_date)}
+                  </p>
+
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>

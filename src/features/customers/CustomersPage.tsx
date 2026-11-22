@@ -217,7 +217,7 @@ export function CustomersPage() {
                         {customer.name}
                       </Link>
                     </td>
-                    <td className="px-4 py-3">{customer.gstin ?? '—'}</td>
+                    <td className="px-4 py-3 font-mono text-xs">{customer.gstin ?? '—'}</td>
                     <td className="px-4 py-3">{stateName(customer.state_code)}</td>
                     <td className="px-4 py-3">{customer.email ?? '—'}</td>
                     <td className="px-4 py-3">{customer.phone ?? '—'}</td>
@@ -243,7 +243,7 @@ export function CustomersPage() {
                 </Link>
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                   <dt className="text-muted-foreground">GSTIN</dt>
-                  <dd>{customer.gstin ?? '—'}</dd>
+                  <dd className="font-mono text-xs">{customer.gstin ?? '—'}</dd>
                   <dt className="text-muted-foreground">State</dt>
                   <dd>{stateName(customer.state_code)}</dd>
                   <dt className="text-muted-foreground">Email</dt>

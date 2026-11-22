@@ -195,7 +195,7 @@ export function BusinessProfileForm({ profile, onSaved }: BusinessProfileFormPro
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-8">
-      <section className="space-y-4">
+      <section className="space-y-4 rounded-lg border p-5">
         <h3 className="text-sm font-semibold">Business details</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id="bp-business-name" label="Business name" required>
@@ -240,7 +240,7 @@ export function BusinessProfileForm({ profile, onSaved }: BusinessProfileFormPro
         </div>
       </section>
 
-      <section className="space-y-4">
+      <section className="space-y-4 rounded-lg border p-5">
         <h3 className="text-sm font-semibold">Contact</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field id="bp-email" label="Email">
@@ -264,8 +264,8 @@ export function BusinessProfileForm({ profile, onSaved }: BusinessProfileFormPro
         </div>
       </section>
 
-      <section className="space-y-4">
-        <h3 className="text-sm font-semibold">Tax</h3>
+      <section className="space-y-4 rounded-lg border p-5">
+        <h3 className="text-sm font-semibold">GST and tax</h3>
         {showTaxWarning ? (
           <p role="status" className="text-sm text-muted-foreground">
             Add your GSTIN and state so invoices use the correct CGST/SGST or IGST split.
@@ -277,7 +277,7 @@ export function BusinessProfileForm({ profile, onSaved }: BusinessProfileFormPro
               id="bp-gstin"
               type="text"
               maxLength={15}
-              className={INPUT_CLASS}
+              className={`${INPUT_CLASS} font-mono uppercase`}
               value={values.gstin}
               onChange={(e) => setField('gstin', e.target.value.toUpperCase())}
             />
@@ -335,7 +335,7 @@ export function BusinessProfileForm({ profile, onSaved }: BusinessProfileFormPro
         </div>
       </section>
 
-      <section className="space-y-4">
+      <section className="space-y-4 rounded-lg border p-5">
         <h3 className="text-sm font-semibold">Cash and invoicing</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
@@ -344,7 +344,7 @@ export function BusinessProfileForm({ profile, onSaved }: BusinessProfileFormPro
                 id="bp-cash-balance"
                 type="text"
                 inputMode="decimal"
-                className={INPUT_CLASS}
+                className={`${INPUT_CLASS} text-right tabular-nums`}
                 value={values.startingCashBalance}
                 onChange={(e) => setField('startingCashBalance', e.target.value)}
                 aria-describedby="bp-cash-help"

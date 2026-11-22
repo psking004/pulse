@@ -8,15 +8,19 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur sm:px-6">
-      <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation" onClick={onMenuClick}>
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background/95 px-4 backdrop-blur sm:px-6">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-9 w-9 cursor-pointer lg:hidden"
+        aria-label="Open navigation"
+        onClick={onMenuClick}
+      >
         <Menu className="h-5 w-5" aria-hidden="true" />
       </Button>
-      <p className="hidden text-sm text-muted-foreground md:block">
-        Your business. Your cashflow. Your next move.
-      </p>
+      <p className="hidden text-sm font-medium text-muted-foreground md:block">Business cashflow</p>
       <div className="flex-1" />
-      <Button variant="ghost" size="icon" aria-label="Notifications" title="Coming soon">
+      <Button variant="ghost" size="icon" className="h-9 w-9 cursor-pointer" aria-label="Notifications" title="Coming soon">
         <Bell className="h-5 w-5" aria-hidden="true" />
       </Button>
       <AccountMenu />

@@ -18,7 +18,7 @@ export function AppShell() {
         <Sidebar open={mobileOpen} onClose={() => setMobileOpen(false)} />
         <div className="lg:pl-64 flex min-h-screen flex-col">
           <Header onMenuClick={() => setMobileOpen(true)} />
-          <main id="main-content" className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6 lg:p-8">
+          <main id="main-content" className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
             <Outlet />
           </main>
         </div>

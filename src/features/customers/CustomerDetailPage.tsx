@@ -10,11 +10,11 @@ import { CustomerForm } from '@/features/customers/CustomerForm';
 import { formatDate, todayISO } from '@/lib/dates';
 import { INDIAN_STATES } from '@/lib/indianStates';
 import { formatMoney } from '@/lib/money';
-import { PAYMENT_STATE_LABEL, paymentStateBadgeVariant, paymentStateFor } from '@/lib/invoiceStatus';
+import { PAYMENT_STATE_LABEL, paymentStateFor } from '@/lib/invoiceStatus';
 import { deleteCustomer, getCustomer } from '@/services/customers';
 import { getProfile } from '@/services/profile';
 import { listInvoices } from '@/services/invoices';
-import type { Customer, InvoiceWithCustomer } from '@/types/domain';
+import type { Customer, InvoiceWithCustomer, PaymentState } from '@/types/domain';
 
 const STATE_NAMES = new Map<string, string>(INDIAN_STATES.map((state) => [state.code, state.name] as const));
 
@@ -39,6 +39,15 @@ function orDash(value: string | null): string {
 
 function termsLabel(days: number | null): string {
   return days == null ? 'Default (from business profile)' : `${days} days`;
+}
+
+type InvoiceBadgeVariant = 'success' | 'destructive' | 'warning' | 'outline';
+
+function invoiceBadgeVariant(state: PaymentState): InvoiceBadgeVariant {
+  if (state === 'paid') return 'success';
+  if (state === 'overdue') return 'destructive';
+  if (state === 'partially_paid') return 'warning';
+  return 'outline';
 }
 
 interface DetailRowProps {
@@ -197,6 +206,25 @@ export function CustomerDetailPage() {
         />
       </div>
 
+      <dl className="mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        <div className="flex items-center gap-1.5">
+          <dt className="text-muted-foreground">GSTIN</dt>
+          <dd className="font-mono text-xs">{orDash(customer.gstin)}</dd>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <dt className="text-muted-foreground">State</dt>
+          <dd>{stateName(customer.state_code)}</dd>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <dt className="text-muted-foreground">Terms</dt>
+          <dd>{termsLabel(customer.payment_terms_days)}</dd>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <dt className="text-muted-foreground">Invoices</dt>
+          <dd className="tabular-nums">{invoices.length}</dd>
+        </div>
+      </dl>
+
       {status ? (
         <p role="status" className="mb-4 text-sm text-muted-foreground">
           {status}
@@ -282,10 +310,10 @@ export function CustomerDetailPage() {
                           </td>
                           <td className="px-4 py-3">{formatDate(invoice.issue_date)}</td>
                           <td className="px-4 py-3">{formatDate(invoice.due_date)}</td>
-                          <td className="px-4 py-3 text-right">{formatMoney(invoice.total_amount, currency)}</td>
-                          <td className="px-4 py-3 text-right">{formatMoney(invoice.balance_due, currency)}</td>
+                          <td className="px-4 py-3 text-right tabular-nums">{formatMoney(invoice.total_amount, currency)}</td>
+                          <td className="px-4 py-3 text-right tabular-nums">{formatMoney(invoice.balance_due, currency)}</td>
                           <td className="px-4 py-3">
-                            <Badge variant={paymentStateBadgeVariant(state)}>{PAYMENT_STATE_LABEL[state]}</Badge>
+                            <Badge variant={invoiceBadgeVariant(state)}>{PAYMENT_STATE_LABEL[state]}</Badge>
                           </td>
                         </tr>
                       );
@@ -303,7 +331,7 @@ export function CustomerDetailPage() {
                         <Link to={`/invoices/${invoice.id}`} className="font-medium text-primary hover:underline">
                           {invoice.invoice_number}
                         </Link>
-                        <Badge variant={paymentStateBadgeVariant(state)}>{PAYMENT_STATE_LABEL[state]}</Badge>
+                        <Badge variant={invoiceBadgeVariant(state)}>{PAYMENT_STATE_LABEL[state]}</Badge>
                       </div>
                       <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                         <dt className="text-muted-foreground">Issued</dt>

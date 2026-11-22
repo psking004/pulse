@@ -105,21 +105,22 @@ export function SettingsPage() {
           <CardTitle>Account</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm">
-            {user?.email ? (
-              <>
-                Signed in as <span className="font-medium">{user.email}</span>
-              </>
-            ) : (
-              <span className="text-muted-foreground">Not signed in</span>
-            )}
-          </p>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm">
+              {user?.email ? (
+                <>
+                  Signed in as <span className="font-medium">{user.email}</span>
+                </>
+              ) : (
+                <span className="text-muted-foreground">Not signed in</span>
+              )}
+            </p>
             <Button variant="outline" onClick={handleSignOut} disabled={signingOut}>
               <LogOut className="h-4 w-4" aria-hidden="true" />
               Sign out
             </Button>
           </div>
+
           {signOutError ? (
             <p role="alert" className="text-sm text-destructive">
               {signOutError}

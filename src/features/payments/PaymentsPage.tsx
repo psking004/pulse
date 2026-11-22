@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, Search } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -32,19 +33,19 @@ interface SummaryCardProps {
 
 function SummaryCard({ label, value }: SummaryCardProps) {
   return (
-    <Card className="p-6">
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
+    <Card className="p-4">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-1 text-xl font-semibold tabular-nums">{value}</p>
     </Card>
   );
 }
 
 function InvoiceCell({ payment }: { payment: PaymentWithInvoice }): ReactNode {
   if (!payment.invoice_id || !payment.invoice) {
-    return <span className="text-muted-foreground">Unallocated</span>;
+    return <Badge variant="outline">Unallocated</Badge>;
   }
   return (
-    <Link to={`/invoices/${payment.invoice_id}`} className="text-primary hover:underline">
+    <Link to={`/invoices/${payment.invoice_id}`} className="font-medium text-primary hover:underline">
       {payment.invoice.invoice_number}
     </Link>
   );
@@ -259,7 +260,7 @@ export function PaymentsPage() {
         </Card>
       ) : null}
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+      <div className="mb-6 grid gap-3 sm:grid-cols-3">
         <SummaryCard label="Total received" value={formatMoney(totalReceived, currency)} />
         <SummaryCard label="Received this month" value={formatMoney(receivedThisMonth, currency)} />
         <SummaryCard label="Payments recorded" value={String(payments.length)} />
@@ -276,14 +277,20 @@ export function PaymentsPage() {
       ) : (
         <>
           <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-end">
-            <input
-              type="search"
-              aria-label="Search payments"
-              placeholder="Search invoice, customer, reference…"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              className="h-9 w-full rounded-md border border-input bg-card px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:max-w-xs"
-            />
+            <div className="relative w-full lg:max-w-xs">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <input
+                type="search"
+                aria-label="Search payments"
+                placeholder="Search invoice, customer, reference…"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                className="h-9 w-full rounded-md border border-input bg-card pl-9 pr-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
             <select
               aria-label="Filter by method"
               value={methodFilter}
@@ -339,7 +346,6 @@ export function PaymentsPage() {
                     <tr>
                       <th scope="col" className="px-3 py-2 font-medium">Date</th>
                       <th scope="col" className="px-3 py-2 font-medium">Invoice</th>
-                      <th scope="col" className="px-3 py-2 font-medium">Customer</th>
                       <th scope="col" className="px-3 py-2 font-medium">Method</th>
                       <th scope="col" className="px-3 py-2 font-medium">Reference</th>
                       <th scope="col" className="px-3 py-2 text-right font-medium">Amount</th>
@@ -357,10 +363,14 @@ export function PaymentsPage() {
                           <td className="px-3 py-2">{dateText}</td>
                           <td className="px-3 py-2">
                             <InvoiceCell payment={payment} />
+                            {payment.invoice?.customer?.name ? (
+                              <div className="text-xs text-muted-foreground">{payment.invoice.customer.name}</div>
+                            ) : null}
                           </td>
-                          <td className="px-3 py-2">{payment.invoice?.customer?.name ?? '—'}</td>
-                          <td className="px-3 py-2">{paymentMethodLabel(payment.method)}</td>
-                          <td className="px-3 py-2">{payment.reference ?? '—'}</td>
+                          <td className="px-3 py-2">
+                            <Badge variant="secondary">{paymentMethodLabel(payment.method)}</Badge>
+                          </td>
+                          <td className="px-3 py-2 text-muted-foreground">{payment.reference ?? '—'}</td>
                           <td className="px-3 py-2 text-right tabular-nums">{amountText}</td>
                           <td className="px-3 py-2">
                             <div className="flex items-center justify-end gap-1">

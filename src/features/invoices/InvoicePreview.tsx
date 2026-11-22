@@ -12,6 +12,7 @@ interface InvoicePreviewProps {
 const NUMERIC_CELL = 'px-2 py-2 text-right tabular-nums';
 const HEAD_CELL = 'px-2 py-2 font-medium';
 const HEAD_NUMERIC_CELL = 'px-2 py-2 text-right font-medium';
+const LABEL_CLASS = 'text-xs font-semibold uppercase tracking-wide text-slate-600';
 
 /** Display name for a state code, falling back to the raw code when it is not in the list. */
 function stateName(code: string | null): string | null {
@@ -24,13 +25,15 @@ interface TotalLineProps {
   value: string;
   strong?: boolean;
   topBorder?: boolean;
+  emphasis?: boolean;
 }
 
-function TotalLine({ label, value, strong = false, topBorder = false }: TotalLineProps) {
+function TotalLine({ label, value, strong = false, topBorder = false, emphasis = false }: TotalLineProps) {
   const classes = [
     'flex items-center justify-between gap-6 py-1',
-    strong ? 'font-bold' : '',
+    strong ? 'font-semibold' : '',
     topBorder ? 'mt-1 border-t border-slate-900 pt-2' : '',
+    emphasis ? 'mt-2 border-y-2 border-slate-900 py-2 text-base font-bold' : '',
   ].join(' ');
   return (
     <div className={classes}>
@@ -49,7 +52,7 @@ function MetaRow({ label, children }: MetaRowProps) {
   return (
     <>
       <dt className="text-slate-600">{label}</dt>
-      <dd className="font-medium tabular-nums">{children}</dd>
+      <dd className="text-right font-medium tabular-nums">{children}</dd>
     </>
   );
 }
@@ -65,9 +68,9 @@ export function InvoicePreview({ invoice, profile }: InvoicePreviewProps) {
   return (
     <article
       aria-label={`Invoice ${invoice.invoice_number}`}
-      className="w-full border border-slate-300 bg-white p-6 text-slate-900 print:rounded-none sm:p-8"
+      className="w-full border border-slate-300 bg-white p-6 text-slate-900 sm:p-10 print:p-0"
     >
-      <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+      <header className="flex flex-col gap-6 border-b-2 border-slate-900 pb-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 space-y-1 text-sm">
           <p className="text-xl font-semibold">{profile.business_name}</p>
           {profile.address ? <p className="whitespace-pre-line text-slate-600">{profile.address}</p> : null}
@@ -78,33 +81,48 @@ export function InvoicePreview({ invoice, profile }: InvoicePreviewProps) {
         </div>
 
         <div className="shrink-0 space-y-3 text-sm">
-          <h2 className="text-right text-lg font-semibold tracking-wide">TAX INVOICE</h2>
-          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+          <h2 className="text-lg font-semibold tracking-[0.2em] sm:text-right">TAX INVOICE</h2>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1">
             <MetaRow label="Invoice No">{invoice.invoice_number}</MetaRow>
             <MetaRow label="Issue date">{formatDate(invoice.issue_date)}</MetaRow>
             <MetaRow label="Due date">{formatDate(invoice.due_date)}</MetaRow>
-            <MetaRow label="Supply">{isIntra ? 'CGST + SGST (within state)' : 'IGST (inter-state)'}</MetaRow>
           </dl>
         </div>
       </header>
 
-      <section className="mt-8 border-t border-slate-200 pt-4 text-sm">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Bill to</p>
-        <p className="mt-1 font-semibold">{customer?.name ?? '—'}</p>
-        {customer ? (
-          <div className="space-y-0.5">
-            {customer.billing_address ? (
-              <p className="whitespace-pre-line text-slate-700">{customer.billing_address}</p>
+      <section className="grid gap-6 border-t border-slate-200 pt-6 text-sm sm:grid-cols-2">
+        <div className="min-w-0">
+          <p className={LABEL_CLASS}>Billed to</p>
+          <p className="mt-1 font-semibold">{customer?.name ?? '—'}</p>
+          {customer ? (
+            <div className="space-y-0.5">
+              {customer.billing_address ? (
+                <p className="whitespace-pre-line text-slate-700">{customer.billing_address}</p>
+              ) : null}
+              {customer.gstin ? <p className="tabular-nums">GSTIN: {customer.gstin}</p> : null}
+              {customerState ? <p>State: {customerState}</p> : null}
+            </div>
+          ) : null}
+        </div>
+
+        <div className="min-w-0 sm:border-l sm:border-slate-200 sm:pl-6">
+          <p className={LABEL_CLASS}>Supply details</p>
+          <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-6 gap-y-0.5">
+            <dt className="text-slate-600">Supply</dt>
+            <dd>{isIntra ? 'CGST + SGST (within state)' : 'IGST (inter-state)'}</dd>
+            {customerState ? (
+              <>
+                <dt className="text-slate-600">Place of supply</dt>
+                <dd>{customerState}</dd>
+              </>
             ) : null}
-            {customer.gstin ? <p className="tabular-nums">GSTIN: {customer.gstin}</p> : null}
-            {customerState ? <p>State: {customerState}</p> : null}
-          </div>
-        ) : null}
+          </dl>
+        </div>
       </section>
 
       <div className="mt-8 overflow-x-auto print:overflow-visible">
         <table className="w-full min-w-[40rem] text-sm print:min-w-0">
-          <thead className="border-b border-slate-900 text-left">
+          <thead className="bg-slate-100 text-left text-xs uppercase tracking-wide text-slate-600">
             <tr>
               <th scope="col" className={HEAD_CELL}>#</th>
               <th scope="col" className={HEAD_CELL}>Description</th>
@@ -168,13 +186,13 @@ export function InvoicePreview({ invoice, profile }: InvoicePreviewProps) {
           )}
           <TotalLine label="Total" value={money(invoice.total_amount)} strong topBorder />
           <TotalLine label="Amount paid" value={money(invoice.amount_paid)} />
-          <TotalLine label="Balance due" value={money(invoice.balance_due)} strong />
+          <TotalLine label="Balance due" value={money(invoice.balance_due)} emphasis />
         </div>
       </div>
 
       {invoice.notes ? (
         <section className="mt-8 border-t border-slate-200 pt-4 text-sm">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Notes</p>
+          <p className={LABEL_CLASS}>Notes</p>
           <p className="mt-1 whitespace-pre-line">{invoice.notes}</p>
         </section>
       ) : null}

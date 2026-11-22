@@ -7,18 +7,37 @@ import { PageHeader } from '@/components/shared/PageHeader';
 import { PaymentForm, paymentMethodLabel } from '@/features/payments/PaymentForm';
 import { ReminderPanel } from '@/features/invoices/ReminderPanel';
 import { formatDate, todayISO } from '@/lib/dates';
-import { daysOverdue, PAYMENT_STATE_LABEL, paymentStateBadgeVariant, paymentStateFor } from '@/lib/invoiceStatus';
+import { daysOverdue, PAYMENT_STATE_LABEL, paymentStateFor } from '@/lib/invoiceStatus';
 import { formatMoney } from '@/lib/money';
 import { deleteInvoice, getInvoice, setInvoiceStatus } from '@/services/invoices';
 import { getProfile } from '@/services/profile';
-import type { InvoiceDetail, Profile } from '@/types/domain';
+import type { InvoiceDetail, PaymentState, Profile } from '@/types/domain';
 
 interface PageData {
   invoice: InvoiceDetail;
   profile: Profile;
 }
 
+type BadgeTone = 'success' | 'destructive' | 'warning' | 'outline' | 'secondary';
+
 const NUMERIC_CELL = 'px-3 py-2 text-right tabular-nums';
+
+/** Badge tone for a payment state, using the shared badge variants. */
+function stateBadgeTone(state: PaymentState): BadgeTone {
+  switch (state) {
+    case 'paid':
+      return 'success';
+    case 'overdue':
+      return 'destructive';
+    case 'partially_paid':
+      return 'warning';
+    case 'void':
+      return 'secondary';
+    case 'unpaid':
+    case 'draft':
+      return 'outline';
+  }
+}
 
 function messageOf(err: unknown, fallback: string): string {
   return err instanceof Error && err.message ? err.message : fallback;
@@ -208,6 +227,10 @@ export function InvoiceDetailPage() {
           Void invoice
         </Button>
       ) : null}
+      <span className="mx-1 hidden h-6 w-px bg-border sm:block" aria-hidden="true" />
+      <Button variant="outline" className="text-destructive" onClick={removeInvoice} disabled={busy}>
+        Delete invoice
+      </Button>
     </>
   );
 
@@ -238,11 +261,28 @@ export function InvoiceDetailPage() {
       />
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <Badge variant={paymentStateBadgeVariant(state)}>{PAYMENT_STATE_LABEL[state]}</Badge>
+        <Badge variant={stateBadgeTone(state)}>{PAYMENT_STATE_LABEL[state]}</Badge>
         {state === 'overdue' ? (
           <span className="text-sm text-destructive">{daysOverdue(invoice.due_date, today)} days overdue</span>
         ) : null}
       </div>
+
+      <Card className="mb-6">
+        <CardContent className="grid gap-6 p-6 sm:grid-cols-3">
+          <div className="space-y-1 text-sm">
+            <p className="text-muted-foreground">Total</p>
+            <p className="text-lg font-medium tabular-nums">{formatMoney(invoice.total_amount, currency)}</p>
+          </div>
+          <div className="space-y-1 text-sm">
+            <p className="text-muted-foreground">Paid</p>
+            <p className="text-lg font-medium tabular-nums">{formatMoney(invoice.amount_paid, currency)}</p>
+          </div>
+          <div className="space-y-1 sm:text-right">
+            <p className="text-sm text-muted-foreground">Balance due</p>
+            <p className="text-3xl font-semibold tabular-nums">{formatMoney(invoice.balance_due, currency)}</p>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-6">
@@ -370,11 +410,6 @@ export function InvoiceDetailPage() {
         </div>
       </div>
 
-      <div className="mt-8 border-t pt-6">
-        <Button variant="outline" className="text-destructive" onClick={removeInvoice} disabled={busy}>
-          Delete invoice
-        </Button>
-      </div>
     </>
   );
 }

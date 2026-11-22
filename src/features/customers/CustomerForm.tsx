@@ -133,103 +133,116 @@ export function CustomerForm({ initial, onSaved, onCancel }: CustomerFormProps) 
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field id={`${idPrefix}-name`} label={<>Name <span aria-hidden="true" className="text-destructive">*</span></>} className="sm:col-span-2">
-          <input
-            id={`${idPrefix}-name`}
-            type="text"
-            required
-            value={values.name}
-            onChange={(e) => update('name', e.target.value)}
-            className={inputClass}
-          />
-        </Field>
+    <form onSubmit={handleSubmit} noValidate className="space-y-6">
+      <section className="space-y-4">
+        <h3 className="text-sm font-semibold">Contact</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field id={`${idPrefix}-name`} label={<>Name <span aria-hidden="true" className="text-destructive">*</span></>} className="sm:col-span-2">
+            <input
+              id={`${idPrefix}-name`}
+              type="text"
+              required
+              value={values.name}
+              onChange={(e) => update('name', e.target.value)}
+              className={inputClass}
+            />
+          </Field>
 
-        <Field id={`${idPrefix}-email`} label="Email">
-          <input
-            id={`${idPrefix}-email`}
-            type="email"
-            autoComplete="email"
-            value={values.email}
-            onChange={(e) => update('email', e.target.value)}
-            className={inputClass}
-          />
-        </Field>
+          <Field id={`${idPrefix}-email`} label="Email">
+            <input
+              id={`${idPrefix}-email`}
+              type="email"
+              autoComplete="email"
+              value={values.email}
+              onChange={(e) => update('email', e.target.value)}
+              className={inputClass}
+            />
+          </Field>
 
-        <Field id={`${idPrefix}-phone`} label="Phone">
-          <input
-            id={`${idPrefix}-phone`}
-            type="tel"
-            autoComplete="tel"
-            value={values.phone}
-            onChange={(e) => update('phone', e.target.value)}
-            className={inputClass}
-          />
-        </Field>
+          <Field id={`${idPrefix}-phone`} label="Phone">
+            <input
+              id={`${idPrefix}-phone`}
+              type="tel"
+              autoComplete="tel"
+              value={values.phone}
+              onChange={(e) => update('phone', e.target.value)}
+              className={inputClass}
+            />
+          </Field>
 
-        <Field id={`${idPrefix}-address`} label="Billing address" className="sm:col-span-2">
-          <textarea
-            id={`${idPrefix}-address`}
-            rows={3}
-            value={values.billingAddress}
-            onChange={(e) => update('billingAddress', e.target.value)}
-            className={textareaClass}
-          />
-        </Field>
+          <Field id={`${idPrefix}-address`} label="Billing address" className="sm:col-span-2">
+            <textarea
+              id={`${idPrefix}-address`}
+              rows={3}
+              value={values.billingAddress}
+              onChange={(e) => update('billingAddress', e.target.value)}
+              className={textareaClass}
+            />
+          </Field>
+        </div>
+      </section>
 
-        <Field id={`${idPrefix}-gstin`} label="GSTIN">
-          <input
-            id={`${idPrefix}-gstin`}
-            type="text"
-            maxLength={15}
-            autoCapitalize="characters"
-            spellCheck={false}
-            value={values.gstin}
-            onChange={(e) => update('gstin', e.target.value.toUpperCase())}
-            className={inputClass}
-          />
-        </Field>
+      <section className="space-y-4">
+        <div className="space-y-1">
+          <h3 className="text-sm font-semibold">Billing and tax</h3>
+          <p className="text-xs text-muted-foreground">
+            GSTIN and state decide whether invoices to this customer use CGST and SGST (same state) or IGST (different state).
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field id={`${idPrefix}-gstin`} label="GSTIN">
+            <input
+              id={`${idPrefix}-gstin`}
+              type="text"
+              maxLength={15}
+              autoCapitalize="characters"
+              spellCheck={false}
+              value={values.gstin}
+              onChange={(e) => update('gstin', e.target.value.toUpperCase())}
+              className={`${inputClass} font-mono uppercase`}
+            />
+          </Field>
 
-        <Field id={`${idPrefix}-state`} label="State">
-          <select
-            id={`${idPrefix}-state`}
-            value={values.stateCode}
-            onChange={(e) => update('stateCode', e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Select state</option>
-            {INDIAN_STATES.map((state) => (
-              <option key={state.code} value={state.code}>
-                {`${state.name} (${state.code})`}
-              </option>
-            ))}
-          </select>
-        </Field>
+          <Field id={`${idPrefix}-state`} label="State">
+            <select
+              id={`${idPrefix}-state`}
+              value={values.stateCode}
+              onChange={(e) => update('stateCode', e.target.value)}
+              className={inputClass}
+            >
+              <option value="">Select state</option>
+              {INDIAN_STATES.map((state) => (
+                <option key={state.code} value={state.code}>
+                  {`${state.name} (${state.code})`}
+                </option>
+              ))}
+            </select>
+          </Field>
 
-        <Field id={`${idPrefix}-terms`} label="Payment terms (days)">
-          <input
-            id={`${idPrefix}-terms`}
-            type="number"
-            inputMode="numeric"
-            min={0}
-            step={1}
-            value={values.paymentTerms}
-            onChange={(e) => update('paymentTerms', e.target.value)}
-            className={inputClass}
-          />
-        </Field>
+          <Field id={`${idPrefix}-terms`} label="Payment terms (days)">
+            <input
+              id={`${idPrefix}-terms`}
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={1}
+              value={values.paymentTerms}
+              onChange={(e) => update('paymentTerms', e.target.value)}
+              className={inputClass}
+            />
+          </Field>
 
-        <Field id={`${idPrefix}-notes`} label="Notes" className="sm:col-span-2">
-          <textarea
-            id={`${idPrefix}-notes`}
-            rows={3}
-            value={values.notes}
-            onChange={(e) => update('notes', e.target.value)}
-            className={textareaClass}
-          />
-        </Field>
-      </div>
+          <Field id={`${idPrefix}-notes`} label="Notes" className="sm:col-span-2">
+            <textarea
+              id={`${idPrefix}-notes`}
+              rows={3}
+              value={values.notes}
+              onChange={(e) => update('notes', e.target.value)}
+              className={textareaClass}
+            />
+          </Field>
+        </div>
+      </section>
 
       {error ? (
         <p role="alert" className="text-sm text-destructive">

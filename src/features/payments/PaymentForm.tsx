@@ -2,6 +2,7 @@ import { useId, useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { isISODate, todayISO } from '@/lib/dates';
 import { formatMoney, parseAmount, round2 } from '@/lib/money';
+import { cn } from '@/lib/utils';
 import { createPayment, updatePayment, type PaymentInput } from '@/services/payments';
 import type { Payment, PaymentMethod } from '@/types/domain';
 
@@ -133,29 +134,29 @@ export function PaymentForm({
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
-      {showInvoiceSelect ? (
-        <div className="space-y-1.5">
-          <label htmlFor={invoiceSelectId} className={LABEL_CLASS}>
-            Invoice *
-          </label>
-          <select
-            id={invoiceSelectId}
-            className={INPUT_CLASS}
-            value={selectedInvoiceId}
-            onChange={(event) => setSelectedInvoiceId(event.target.value)}
-            required
-          >
-            <option value="">Select invoice</option>
-            {(invoiceOptions ?? []).map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      ) : null}
+      <div className="grid gap-4 md:grid-cols-2">
+        {showInvoiceSelect ? (
+          <div className="space-y-1.5">
+            <label htmlFor={invoiceSelectId} className={LABEL_CLASS}>
+              Invoice *
+            </label>
+            <select
+              id={invoiceSelectId}
+              className={INPUT_CLASS}
+              value={selectedInvoiceId}
+              onChange={(event) => setSelectedInvoiceId(event.target.value)}
+              required
+            >
+              <option value="">Select invoice</option>
+              {(invoiceOptions ?? []).map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <label htmlFor={amountId} className={LABEL_CLASS}>
             Amount *
@@ -164,11 +165,14 @@ export function PaymentForm({
             id={amountId}
             type="text"
             inputMode="decimal"
-            className={INPUT_CLASS}
+            className={cn(INPUT_CLASS, 'text-right tabular-nums')}
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
             required
           />
+          {limit !== undefined ? (
+            <p className="text-xs text-muted-foreground">Balance due: {formatMoney(limit, currency)}</p>
+          ) : null}
         </div>
 
         <div className="space-y-1.5">
@@ -206,7 +210,7 @@ export function PaymentForm({
           </select>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 md:col-span-2">
           <label htmlFor={referenceId} className={LABEL_CLASS}>
             Reference
           </label>
@@ -218,19 +222,19 @@ export function PaymentForm({
             onChange={(event) => setReference(event.target.value)}
           />
         </div>
-      </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor={notesId} className={LABEL_CLASS}>
-          Notes
-        </label>
-        <textarea
-          id={notesId}
-          rows={2}
-          className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          value={notes}
-          onChange={(event) => setNotes(event.target.value)}
-        />
+        <div className="space-y-1.5 md:col-span-2">
+          <label htmlFor={notesId} className={LABEL_CLASS}>
+            Notes
+          </label>
+          <textarea
+            id={notesId}
+            rows={2}
+            className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
+          />
+        </div>
       </div>
 
       {error ? (

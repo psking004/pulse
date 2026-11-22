@@ -142,206 +142,221 @@ export function ExpenseForm({ initial, onSaved, onCancel }: ExpenseFormProps) {
   const isBill = kind === 'bill';
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="grid gap-4 sm:grid-cols-2">
-      <div className="space-y-1.5">
-        <label htmlFor="expense-form-supplier" className="text-sm font-medium">
-          Supplier *
-        </label>
-        <input
-          id="expense-form-supplier"
-          type="text"
-          required
-          className={INPUT_CLASS}
-          value={supplier}
-          onChange={(e) => setSupplier(e.target.value)}
-        />
-      </div>
+    <form onSubmit={handleSubmit} noValidate className="space-y-6">
+      <section className="space-y-4">
+        <h3 className="text-sm font-semibold">Details</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label htmlFor="expense-form-supplier" className="text-sm font-medium">
+              Supplier *
+            </label>
+            <input
+              id="expense-form-supplier"
+              type="text"
+              required
+              className={INPUT_CLASS}
+              value={supplier}
+              onChange={(e) => setSupplier(e.target.value)}
+            />
+          </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor="expense-form-description" className="text-sm font-medium">
-          Description
-        </label>
-        <input
-          id="expense-form-description"
-          type="text"
-          className={INPUT_CLASS}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </div>
+          <div className="space-y-1.5">
+            <label htmlFor="expense-form-description" className="text-sm font-medium">
+              Description
+            </label>
+            <input
+              id="expense-form-description"
+              type="text"
+              className={INPUT_CLASS}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor="expense-form-category" className="text-sm font-medium">
-          Category
-        </label>
-        <input
-          id="expense-form-category"
-          type="text"
-          list={CATEGORY_LIST_ID}
-          className={INPUT_CLASS}
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        />
-        <datalist id={CATEGORY_LIST_ID}>
-          {CATEGORY_SUGGESTIONS.map((name) => (
-            <option key={name} value={name} />
-          ))}
-        </datalist>
-      </div>
+          <div className="space-y-1.5">
+            <label htmlFor="expense-form-category" className="text-sm font-medium">
+              Category
+            </label>
+            <input
+              id="expense-form-category"
+              type="text"
+              list={CATEGORY_LIST_ID}
+              className={INPUT_CLASS}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            />
+            <datalist id={CATEGORY_LIST_ID}>
+              {CATEGORY_SUGGESTIONS.map((name) => (
+                <option key={name} value={name} />
+              ))}
+            </datalist>
+          </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor="expense-form-type" className="text-sm font-medium">
-          Type
-        </label>
-        <select
-          id="expense-form-type"
-          className={INPUT_CLASS}
-          value={kind}
-          onChange={(e) => handleKindChange(e.target.value === 'bill' ? 'bill' : 'expense')}
-        >
-          <option value="expense">Expense</option>
-          <option value="bill">Bill</option>
-        </select>
-      </div>
+          <div className="space-y-1.5">
+            <label htmlFor="expense-form-type" className="text-sm font-medium">
+              Type
+            </label>
+            <select
+              id="expense-form-type"
+              className={INPUT_CLASS}
+              value={kind}
+              onChange={(e) => handleKindChange(e.target.value === 'bill' ? 'bill' : 'expense')}
+            >
+              <option value="expense">Expense</option>
+              <option value="bill">Bill</option>
+            </select>
+          </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor="expense-form-amount" className="text-sm font-medium">
-          Amount *
-        </label>
-        <input
-          id="expense-form-amount"
-          type="text"
-          inputMode="decimal"
-          className={INPUT_CLASS}
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-      </div>
+          <div className="space-y-1.5">
+            <label htmlFor="expense-form-date" className="text-sm font-medium">
+              Transaction date *
+            </label>
+            <input
+              id="expense-form-date"
+              type="date"
+              required
+              className={INPUT_CLASS}
+              value={expenseDate}
+              onChange={(e) => setExpenseDate(e.target.value)}
+            />
+          </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor="expense-form-gst" className="text-sm font-medium">
-          GST included
-        </label>
-        <input
-          id="expense-form-gst"
-          type="text"
-          inputMode="decimal"
-          className={INPUT_CLASS}
-          value={gst}
-          onChange={(e) => setGst(e.target.value)}
-        />
-      </div>
+          {isBill ? (
+            <div className="space-y-1.5">
+              <label htmlFor="expense-form-due" className="text-sm font-medium">
+                Due date *
+              </label>
+              <input
+                id="expense-form-due"
+                type="date"
+                required
+                className={INPUT_CLASS}
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+              />
+            </div>
+          ) : null}
 
-      <div className="space-y-1.5">
-        <label htmlFor="expense-form-date" className="text-sm font-medium">
-          Transaction date *
-        </label>
-        <input
-          id="expense-form-date"
-          type="date"
-          required
-          className={INPUT_CLASS}
-          value={expenseDate}
-          onChange={(e) => setExpenseDate(e.target.value)}
-        />
-      </div>
+          <div className="space-y-1.5">
+            <label htmlFor="expense-form-gstin" className="text-sm font-medium">
+              Vendor GSTIN
+            </label>
+            <input
+              id="expense-form-gstin"
+              type="text"
+              className={`${INPUT_CLASS} font-mono uppercase`}
+              value={gstin}
+              onChange={(e) => setGstin(e.target.value.toUpperCase())}
+            />
+          </div>
 
-      {isBill ? (
-        <div className="space-y-1.5">
-          <label htmlFor="expense-form-due" className="text-sm font-medium">
-            Due date *
-          </label>
-          <input
-            id="expense-form-due"
-            type="date"
-            required
-            className={INPUT_CLASS}
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-          />
+          <div className="space-y-1.5 sm:col-span-2">
+            <label htmlFor="expense-form-notes" className="text-sm font-medium">
+              Notes
+            </label>
+            <textarea
+              id="expense-form-notes"
+              rows={3}
+              className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          </div>
         </div>
-      ) : null}
+      </section>
 
-      <div className="space-y-1.5">
-        <div className="flex h-5 items-center gap-2">
-          <input
-            id="expense-form-paid"
-            type="checkbox"
-            className="h-4 w-4 rounded border-input"
-            checked={paid}
-            onChange={(e) => setPaid(e.target.checked)}
-          />
-          <label htmlFor="expense-form-paid" className="text-sm font-medium">
-            Paid
-          </label>
+      <section className="space-y-4">
+        <h3 className="text-sm font-semibold">Amount and tax</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label htmlFor="expense-form-amount" className="text-sm font-medium">
+              Amount *
+            </label>
+            <input
+              id="expense-form-amount"
+              type="text"
+              inputMode="decimal"
+              className={`${INPUT_CLASS} text-right tabular-nums`}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="expense-form-gst" className="text-sm font-medium">
+              GST included
+            </label>
+            <input
+              id="expense-form-gst"
+              type="text"
+              inputMode="decimal"
+              className={`${INPUT_CLASS} text-right tabular-nums`}
+              value={gst}
+              onChange={(e) => setGst(e.target.value)}
+            />
+          </div>
         </div>
-        {paid ? (
-          <input
-            id="expense-form-paid-on"
-            type="date"
-            aria-label="Paid on"
-            className={INPUT_CLASS}
-            value={paidOn}
-            onChange={(e) => setPaidOn(e.target.value)}
-          />
-        ) : null}
-      </div>
+      </section>
 
-      <div className="space-y-1.5">
-        <label htmlFor="expense-form-method" className="text-sm font-medium">
-          Payment method
-        </label>
-        <select
-          id="expense-form-method"
-          className={INPUT_CLASS}
-          value={method}
-          onChange={(e) => {
-            const found = PAYMENT_METHOD_OPTIONS.find((o) => o.value === e.target.value);
-            setMethod(found ? found.value : '');
-          }}
-        >
-          <option value="">Not recorded</option>
-          {PAYMENT_METHOD_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <section className="space-y-4">
+        <h3 className="text-sm font-semibold">Payment</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <div className="flex h-5 items-center gap-2">
+              <input
+                id="expense-form-paid"
+                type="checkbox"
+                className="h-4 w-4 rounded border-input"
+                checked={paid}
+                onChange={(e) => setPaid(e.target.checked)}
+              />
+              <label htmlFor="expense-form-paid" className="text-sm font-medium">
+                Paid
+              </label>
+            </div>
+            {paid ? (
+              <input
+                id="expense-form-paid-on"
+                type="date"
+                aria-label="Paid on"
+                className={INPUT_CLASS}
+                value={paidOn}
+                onChange={(e) => setPaidOn(e.target.value)}
+              />
+            ) : null}
+          </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor="expense-form-gstin" className="text-sm font-medium">
-          Vendor GSTIN
-        </label>
-        <input
-          id="expense-form-gstin"
-          type="text"
-          className={INPUT_CLASS}
-          value={gstin}
-          onChange={(e) => setGstin(e.target.value.toUpperCase())}
-        />
-      </div>
-
-      <div className="space-y-1.5 sm:col-span-2">
-        <label htmlFor="expense-form-notes" className="text-sm font-medium">
-          Notes
-        </label>
-        <textarea
-          id="expense-form-notes"
-          rows={3}
-          className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        />
-      </div>
+          <div className="space-y-1.5">
+            <label htmlFor="expense-form-method" className="text-sm font-medium">
+              Payment method
+            </label>
+            <select
+              id="expense-form-method"
+              className={INPUT_CLASS}
+              value={method}
+              onChange={(e) => {
+                const found = PAYMENT_METHOD_OPTIONS.find((o) => o.value === e.target.value);
+                setMethod(found ? found.value : '');
+              }}
+            >
+              <option value="">Not recorded</option>
+              {PAYMENT_METHOD_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </section>
 
       {error ? (
-        <p role="alert" className="text-sm text-destructive sm:col-span-2">
+        <p role="alert" className="text-sm text-destructive">
           {error}
         </p>
       ) : null}
 
-      <div className="flex justify-end gap-2 sm:col-span-2">
+      <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={onCancel} disabled={saving}>
           Cancel
         </Button>
@@ -351,4 +366,5 @@ export function ExpenseForm({ initial, onSaved, onCancel }: ExpenseFormProps) {
       </div>
     </form>
   );
+
 }

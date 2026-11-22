@@ -2,23 +2,26 @@
 
 :root {
   color-scheme: light;
-  --background: #f8fafc;
+  --background: #f7f9fb;
   --foreground: #0f172a;
   --card: #ffffff;
   --card-foreground: #0f172a;
   --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --muted-foreground: #526173;
   --accent: #f0fdfa;
-  --accent-foreground: #0f766e;
+  --accent-foreground: #115e59;
   --primary: #0f766e;
+  --primary-hover: #115e59;
   --primary-foreground: #ffffff;
   --secondary: #f1f5f9;
   --secondary-foreground: #0f172a;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
+  --border: #e3e8ef;
+  --input: #d5dde6;
   --ring: #14b8a6;
-  --destructive: #dc2626;
+  --destructive: #b42318;
   --destructive-foreground: #ffffff;
+  --warning: #b45309;
+  --success: #047857;
 }
 
 @theme inline {
@@ -39,6 +42,8 @@
   --color-ring: var(--ring);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -49,10 +54,30 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply tracking-tight;
+    font-weight: 600;
   }
 
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
   }
 }

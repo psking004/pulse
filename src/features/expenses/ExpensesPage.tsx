@@ -27,6 +27,15 @@ const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
 
 type ExpenseStatus = 'Paid' | 'Unpaid' | 'Overdue' | 'Due soon';
 
+const QUICK_FILTERS: { value: StatusFilter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'unpaid_bills', label: 'Unpaid bills' },
+  { value: 'overdue', label: 'Overdue' },
+  { value: 'paid', label: 'Paid' },
+  { value: 'expenses', label: 'Expenses' },
+  { value: 'bills', label: 'Bills' },
+];
+
 const INPUT_CLASS =
   'h-9 w-full rounded-md border border-input bg-card px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
 
@@ -79,13 +88,15 @@ function toPaymentMethod(value: string): ExpensePaymentMethod | '' {
 }
 
 function StatusBadge({ status }: { status: ExpenseStatus }) {
-  const variant = status === 'Paid' ? 'secondary' : 'outline';
-  const className = status === 'Overdue' ? 'border-destructive text-destructive' : undefined;
-  return (
-    <Badge variant={variant} className={className}>
-      {status}
-    </Badge>
-  );
+  const variant =
+    status === 'Paid' ? 'success' : status === 'Overdue' ? 'destructive' : status === 'Due soon' ? 'warning' : 'outline';
+  return <Badge variant={variant}>{status}</Badge>;
+}
+
+function rowAccent(status: ExpenseStatus): string {
+  if (status === 'Overdue') return 'border-l-4 border-l-red-500';
+  if (status === 'Due soon') return 'border-l-4 border-l-amber-500';
+  return '';
 }
 
 interface SummaryCardProps {
@@ -97,9 +108,9 @@ interface SummaryCardProps {
 
 function SummaryCard({ label, value, detail, alert = false }: SummaryCardProps) {
   return (
-    <Card className="p-5">
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className={cn('mt-1 text-2xl font-semibold tabular-nums', alert && 'text-destructive')}>
+    <Card className="p-4">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className={cn('mt-1 text-xl font-semibold tabular-nums', alert && 'text-destructive')}>
         {value}
       </p>
       <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
@@ -176,9 +187,9 @@ function PayForm({
     <form
       onSubmit={handleSubmit}
       noValidate
-      className="flex flex-col gap-3 rounded-md bg-muted/50 p-3 sm:flex-row sm:items-end"
+      className="grid gap-3 rounded-md bg-muted/50 p-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
     >
-      <div className="flex-1 space-y-1.5">
+      <div className="space-y-1.5">
         <label htmlFor={`${idPrefix}-paid-on`} className="text-sm font-medium">
           Paid on
         </label>
@@ -190,7 +201,7 @@ function PayForm({
           onChange={(e) => onPaidOnChange(e.target.value)}
         />
       </div>
-      <div className="flex-1 space-y-1.5">
+      <div className="space-y-1.5">
         <label htmlFor={`${idPrefix}-method`} className="text-sm font-medium">
           Payment method
         </label>
@@ -208,7 +219,7 @@ function PayForm({
           ))}
         </select>
       </div>
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <Button type="button" variant="outline" size="sm" disabled={busy} onClick={onCancel}>
           Cancel
         </Button>
@@ -447,7 +458,7 @@ export function ExpensesPage() {
 
     return (
       <>
-        <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <SummaryCard
             label="Unpaid bills"
             value={fmt(sumAmounts(summary.unpaidBills))}
@@ -471,6 +482,30 @@ export function ExpensesPage() {
             value={fmt(sumAmounts(summary.thisMonth))}
             detail={`${plural(summary.thisMonth.length, 'entry')} this month`}
           />
+        </div>
+
+        <div
+          role="group"
+          aria-label="Quick filters"
+          className="mb-4 inline-flex max-w-full flex-wrap gap-1 rounded-lg border bg-muted/40 p-1"
+        >
+          {QUICK_FILTERS.map((f) => {
+            const active = statusFilter === f.value;
+            return (
+              <button
+                key={f.value}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setStatusFilter(f.value)}
+                className={cn(
+                  'rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  active ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {f.label}
+              </button>
+            );
+          })}
         </div>
 
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
@@ -559,7 +594,7 @@ export function ExpensesPage() {
                   {filtered.map((e) => (
                     <Fragment key={e.id}>
                       <tr className="border-t">
-                        <td className="px-4 py-3">
+                        <td className={cn('px-4 py-3', rowAccent(statusOf(e, today)))}>
                           <div className="font-medium">{e.supplier}</div>
                           {e.description ? (
                             <div className="text-xs text-muted-foreground">{e.description}</div>
@@ -603,7 +638,7 @@ export function ExpensesPage() {
 
             <div className="space-y-3 md:hidden">
               {filtered.map((e) => (
-                <div key={e.id} className="rounded-xl border bg-card p-4">
+                <div key={e.id} className={cn('rounded-xl border bg-card p-4', rowAccent(statusOf(e, today)))}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="font-medium">{e.supplier}</div>

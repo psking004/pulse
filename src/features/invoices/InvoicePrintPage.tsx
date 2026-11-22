@@ -50,7 +50,7 @@ export function InvoicePrintPage() {
 
   if (loading && !data) {
     return (
-      <div className="min-h-screen bg-muted/30 p-4 print:bg-white">
+      <div className="min-h-screen bg-muted/40 p-4 print:bg-white">
         {backLink}
         <p role="status" className="mt-4 text-sm text-muted-foreground">
           Loading invoice…
@@ -61,7 +61,7 @@ export function InvoicePrintPage() {
 
   if (loadError || !data) {
     return (
-      <div className="min-h-screen bg-muted/30 p-4 print:bg-white">
+      <div className="min-h-screen bg-muted/40 p-4 print:bg-white">
         {backLink}
         <p role="alert" className="mt-4 text-sm text-destructive">
           {loadError ?? 'Invoice not found.'}
@@ -73,8 +73,8 @@ export function InvoicePrintPage() {
   const { invoice, profile } = data;
 
   return (
-    <div className="min-h-screen bg-muted/30 p-4 print:bg-white">
-      <div className="print:hidden flex items-center justify-between gap-3 mb-4 max-w-4xl mx-auto">
+    <div className="min-h-screen bg-muted/40 p-4 print:bg-white">
+      <div className="mx-auto mb-4 flex max-w-4xl items-center justify-between gap-3 print:hidden">
         <Link to={`/invoices/${invoice.id}`} className="text-sm text-primary hover:underline">
           ← Back to invoice
         </Link>
