@@ -156,18 +156,18 @@ function Field({
 export function BusinessProfileForm({ profile, onSaved }: BusinessProfileFormProps) {
   const [values, setValues] = useState<FormValues>(() => initialValues(profile));
   const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
 
   function setField<K extends keyof FormValues>(key: K, value: FormValues[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
-    setSaved(false);
+    setSavedAt(null);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    setSaved(false);
+    setSavedAt(null);
 
     const result = buildPatch(values);
     if (!result.ok) {
@@ -178,7 +178,7 @@ export function BusinessProfileForm({ profile, onSaved }: BusinessProfileFormPro
     setSaving(true);
     try {
       const updated = await updateProfile(result.patch);
-      setSaved(true);
+      setSavedAt(Date.now());
       onSaved(updated);
     } catch {
       setError('Could not save your business profile. Please try again.');
@@ -389,7 +389,7 @@ export function BusinessProfileForm({ profile, onSaved }: BusinessProfileFormPro
         </div>
       </section>
 
-      {saved ? (
+      {savedAt !== null ? (
         <p role="status" className="text-sm text-muted-foreground">
           Business profile saved.
         </p>

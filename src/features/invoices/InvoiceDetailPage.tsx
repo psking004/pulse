@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { PaymentForm, paymentMethodLabel } from '@/features/payments/PaymentForm';
+import { ReminderPanel } from '@/features/invoices/ReminderPanel';
 import { formatDate, todayISO } from '@/lib/dates';
 import { daysOverdue, PAYMENT_STATE_LABEL, paymentStateBadgeVariant, paymentStateFor } from '@/lib/invoiceStatus';
 import { formatMoney } from '@/lib/money';
@@ -320,6 +321,15 @@ export function InvoiceDetailPage() {
               <TotalRow label="Balance due" value={formatMoney(invoice.balance_due, currency)} strong />
             </dl>
           </Panel>
+
+          {invoice.status === 'sent' && invoice.balance_due > 0 ? (
+            <ReminderPanel
+              invoiceId={invoice.id}
+              invoiceNumber={invoice.invoice_number}
+              customerName={invoice.customer?.name ?? 'the customer'}
+              currency={profile.currency}
+            />
+          ) : null}
 
           <Panel title="Payments">
             {invoice.amount_paid > 0 && invoice.balance_due > 0 ? (

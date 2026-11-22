@@ -92,7 +92,7 @@ export function SettingsPage() {
           </CardHeader>
           <CardContent>
             <BusinessProfileForm
-              key={profile.updated_at}
+              key="business-profile"
               profile={profile}
               onSaved={(p) => setProfile(p)}
             />
